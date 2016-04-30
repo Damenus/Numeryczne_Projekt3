@@ -2,6 +2,7 @@
 #include <iostream>
 
 #define K 20
+#define J (K - 1)
 #define N 101
 #define IND 4
 
@@ -77,11 +78,33 @@ void wylicz_delta() {
 	}
 }
 
+void warunki_brzegowe_a() {
+	lambda[0] = 0.0;
+	delta[0] = 0.0;
+	mi[K - 1] = 0.0;
+	delta[K - 1] = 0.0;
+}
+
 void warunki_brzegowe_b() {
 	lambda[0] = 1.0;
 	mi[K - 1] = 1.0;
 
-	delta[0] = 6.0 / h[1] * (((freq[1] - freq[0]) / h[1]) - 1);
+	delta[0] = 6.0 / h[1] * (((freq[1] - freq[0]) / h[1]) - 1); //pochodna
+	delta[K - 1] = 6.0 / h[K - 1] * (1 - ((freq[K-1] - freq[K-2]) / h[K-1])); //pochodna
+}
+
+double a[K - 1];
+double b[K - 1];
+double c[K - 1];
+double d[K - 1];
+
+//niewiadoma!!!
+double M[K]; // b + 2 * c * ( x1 -x0) + 3 * d * (x1 - x0) ^ 2
+
+void wyznacz_wspolczyniki_abcd() {
+	for (int i = 0; i < K; i++) {
+		a[i] = 1;
+	}
 }
 
 
