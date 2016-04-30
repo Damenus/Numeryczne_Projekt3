@@ -43,10 +43,54 @@ double S_dB(double S) {
 //wyliczyæ h(z definicji), mi[1] do mi[N - 1], tak samo lambda i delta, zerowe i Nte elementy z war.brzegowych, 
 //potem rozwi¹zaæ uk³ad równañ liniowych, czyli wyznaczyæ M, podstawiæ do wzoru na szukane a, b, c i d.
 
+double h[K - 1];
+double mi[K - 1];
+double lambda[K - 1];
+double delta[K - 1];
+
+void wylicz_h() {
+	for (int i = 0; i < K; i++) {
+		h[i] = freq[i + 1] - freq[i];
+	}
+}
+
+void wylicz_mi() {
+	mi[0] = 0;
+	mi[K - 1] = 0;
+	for (int i = 1; i < K; i++) {
+		mi[i] = h[i] / (h[i] + h[i + 1]);
+	}
+}
+
+void wylicz_lambda() {
+	lambda[0] = 0;
+	for (int i = 1; i < K; i++) {
+		lambda[i] = h[i + 1] / (h[i] + h[i + 1]);
+	}
+}
+
+void wylicz_delta() {
+	delta[0] = 0;
+	delta[K - 1] = 0;
+	for (int i = 1; i < K; i++) {
+		delta[i] = (6.0 / (h[i] + h[i + 1])) * (((freq[i + 1] - freq[i]) / h[i + 1]) - ((freq[i] - freq[i - 1]) / h[i]));
+	}
+}
+
+void warunki_brzegowe_b() {
+	lambda[0] = 1.0;
+	mi[K - 1] = 1.0;
+
+	delta[0] = 6.0 / h[1] * (((freq[1] - freq[0]) / h[1]) - 1);
+}
+
 
 int main()
 {
-
+	wylicz_h();
+	wylicz_mi();
+	wylicz_lambda();
+	wylicz_delta();
 
 	return 0;
 }

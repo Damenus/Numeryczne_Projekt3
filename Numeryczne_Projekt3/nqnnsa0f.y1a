@@ -40,12 +40,42 @@ double S_dB(double S) {
 	return 20 * log10(S);
 }
 
-//wyliczyæ h(z definicji), mi[1] do mi[N - 1], tak samo lambda i delta, zerowe i Nte elementy z war.brzegowych, 
-//potem rozwi¹zaæ uk³ad równañ liniowych, czyli wyznaczyæ M, podstawiæ do wzoru na szukane a, b, c i d.
+double h[K - 1];
+double mi[K - 1];
+double lambda[K - 1];
+double delta[K - 1];
+
+void wylicz_h() {
+	for (int i = 0; i < K; i++) {
+		h[i] = freq[i + 1] - freq[i];
+	}
+}
+
+void wylicz_mi() {
+	mi[0] = 0;
+	for (int i = 1; i < K; i++) {
+		mi[i] = h[i] / (h[i] + h[i + 1]);
+	}
+}
+
+void wylicz_lambda() {
+	lambda[0] = 0;
+	for (int i = 1; i < K; i++) {
+		lambda[i] = h[i + 1] / (h[i] + h[i + 1]);
+	}
+}
+
+void wylicz_delta() {
+	delta[0] = 0;
+	for (int i = 1; i < K; i++) {
+		delta[i] = (6 / (h[i] + h[i + 1])) * (((freq[i + 1] - freq[i]) / h[i + 1]) - ((freq[i] - freq[i - 1]) / h[i]));
+	}
+}
 
 
 int main()
 {
+
 
 
 	return 0;
