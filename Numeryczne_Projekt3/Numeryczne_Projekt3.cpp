@@ -1,10 +1,14 @@
 //Damian Darczuk 154824
 #include <iostream>
+#include <math.h>
+#include <fstream>
 
 #define K 20
 #define J (K - 1)
 #define N 101
 #define IND 4
+#define START_F 2.16
+#define END_F 2.66
 
 using namespace std;
 
@@ -171,6 +175,29 @@ void wyznacz_wspolczyniki_abcd() {
 	}
 }
 
+double X[N];
+double Y[N];
+
+void wzynacz_X() {
+	//liczye co ile bedzie X
+	double krok = (END_F - START_F) / N;
+	//wyznaczam wszystkie X
+	for (int i = 0; i < N; i++) { //i mo¿e zaczynaæ siê od 1
+		X[i] = START_F + (i * krok);
+	}
+}
+
+void oblicz_Y() {
+	for (int i = 0; i < N; i++) { 
+		for (int j = 0; j < K; j++) {
+			if (X[i] > freq[j] && X[i] < freq[j + i]) {
+				Y[i] = a[j] * pow(X[i], 3) + b[j] * pow(X[i], 2) + c[j] * X[i] + d[j];
+				break;
+			}
+		}
+	}
+
+}
 
 int main()
 {
@@ -184,6 +211,9 @@ int main()
 	gauss();
 
 	wyznacz_wspolczyniki_abcd();
+
+	wzynacz_X();
+	oblicz_Y();
 
 	for (int i = 0; i < K; i++) {
 		cout << i << ": " << M[i] << endl;
