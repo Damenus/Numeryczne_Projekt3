@@ -1,10 +1,12 @@
-
+//Damian Darczuk 154824
 #include <iostream>
 
 #define K 20
 #define J (K - 1)
 #define N 101
 #define IND 4
+
+using namespace std;
 
 double freq[K] = { 2.160913, 2.184642, 2.208656, 2.232956, 2.257543, 2.282417, 2.307579, 2.333029,
 2.358767, 2.384794, 2.411110, 2.437714, 2.464608, 2.491789, 2.519259, 2.547017, 2.575062,
@@ -105,36 +107,67 @@ struct M{
 	// b + 2 * c * ( x1 -x0) + 3 * d * (x1 - x0) ^ 2
 }Mn[K];
 
-M macierz[K][K+1];
+double M[K];
+double macierz_wspolczynikow[K][K+1];
 
 void stworz_uklad_rownan() {
 
 	//wyzerowanie pól, wpisanie wartoœci do kolumny wyrazów wolnych
 	for (int i = 0; i < K; i++) {
 		for (int j = 0; j < K; j++) {
-			macierz[i][j].wartosc = 0.0;
-			macierz[i][j].wspolczynik = 0.0;
+			macierz_wspolczynikow[i][j] = 0.0;
 		}
-		macierz[i][K].wartosc = delta[i];
+		macierz_wspolczynikow[i][K] = delta[i];
 	}
 
 	//wype³nienie wspó³czynikami
 	for (int i = 0; i < K; i++) {
-		if (i != K-2)
-			macierz[i][i + 1].wspolczynik = lambda[i]; //dobrze?
+		if (i != K-1)
+			macierz_wspolczynikow[i][i + 1] = lambda[i]; //dobrze?
 
-		macierz[i][i].wspolczynik = 2.0;
+		macierz_wspolczynikow[i][i] = 2.0;
 
 		if (i != 0)
-			macierz[i][i - 1].wspolczynik = mi[i]; //dobrze?
+			macierz_wspolczynikow[i][i - 1] = mi[i]; //dobrze?
 	}
 
+}
+
+void gauss() {
+
+	//eliminacja
+	double m;
+	for (int i = 0; i < K; i++) { // ka¿da kolumna pokolei
+
+		for (int j = i + 1; j < K; j++) {
+			m = macierz_wspolczynikow[j][i] / macierz_wspolczynikow[i][i]; //wspo³czynnik mno¿enia pierwszego weirsza, by odj¹æ od kolejnych kolumn, by wyzerowaæ dolny trójk¹t
+			for (int k = i; k < K + 1; k++) { // zerowanie kolumny
+				macierz_wspolczynikow[j][k] = macierz_wspolczynikow[j][k] - m * macierz_wspolczynikow[i][k];
+			}
+		}
+	}
+
+	double s;
+	//obliczanie
+	//int n = K - 1;
+	M[K - 1] = macierz_wspolczynikow[K - 1][K] / macierz_wspolczynikow[K - 1][K - 1];
+
+	for (int i = K - 1 - 1; i >= 0; i--){
+		s = 0;
+		for (int k = i + 1; k < K; k++) {
+			s = s + macierz_wspolczynikow[i][k] * M[k];
+			M[i] = (macierz_wspolczynikow[i][K] - s) / macierz_wspolczynikow[i][i];
+		}
+	}
 
 }
 
 void wyznacz_wspolczyniki_abcd() {
 	for (int i = 0; i < K; i++) {
-		a[i] = 1;
+		a[i] = s21[IND][i];
+		b[i] = ((s21[IND][i + 1] - s21[IND][i]) / h[i + 1]) - (((2.0 * M[i] - M[i + 1]) / 6.0) * h[i + 1]);
+		c[i] = M[i] / 2.0;
+		d[i] = (M[i + 1] - M[i]) / (6.0 * h[i + 1]);
 	}
 }
 
@@ -148,6 +181,13 @@ int main()
 	warunki_brzegowe_a();
 
 	stworz_uklad_rownan();
+	gauss();
+
+	wyznacz_wspolczyniki_abcd();
+
+	for (int i = 0; i < K; i++) {
+		cout << i << ": " << M[i] << endl;
+	}
 
 	return 0;
 }
