@@ -199,6 +199,30 @@ void oblicz_Y() {
 
 }
 
+void zapis_do_pliku() {
+
+	fstream plik("plik.txt", ios::out);
+
+	if (plik.good())
+	{
+		for (int i = 0; i < N; i++)
+		{
+			plik << X[i] << endl;
+			plik.flush();
+		}
+
+		plik << endl;
+
+		for (int i = 0; i < N; i++)
+		{
+			plik << Y[i] << endl;
+			plik.flush();
+		}
+
+		plik.close();
+	}
+}
+
 int main()
 {
 	wylicz_h();
@@ -214,6 +238,7 @@ int main()
 
 	wzynacz_X();
 	oblicz_Y();
+	zapis_do_pliku();
 
 	for (int i = 0; i < K; i++) {
 		cout << i << ": " << M[i] << endl;
