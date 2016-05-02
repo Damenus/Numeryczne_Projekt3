@@ -99,7 +99,38 @@ double c[K - 1];
 double d[K - 1];
 
 //niewiadoma!!!
-double M[K]; // b + 2 * c * ( x1 -x0) + 3 * d * (x1 - x0) ^ 2
+struct M{
+	double wartosc = 0.0;
+	double wspolczynik = 1.0;
+	// b + 2 * c * ( x1 -x0) + 3 * d * (x1 - x0) ^ 2
+}Mn[K];
+
+M macierz[K][K+1];
+
+void stworz_uklad_rownan() {
+
+	//wyzerowanie pól, wpisanie wartoœci do kolumny wyrazów wolnych
+	for (int i = 0; i < K; i++) {
+		for (int j = 0; j < K; j++) {
+			macierz[i][j].wartosc = 0.0;
+			macierz[i][j].wspolczynik = 0.0;
+		}
+		macierz[i][K].wartosc = delta[i];
+	}
+
+	//wype³nienie wspó³czynikami
+	for (int i = 0; i < K; i++) {
+		if (i != K-2)
+			macierz[i][i + 1].wspolczynik = lambda[i]; //dobrze?
+
+		macierz[i][i].wspolczynik = 2.0;
+
+		if (i != 0)
+			macierz[i][i - 1].wspolczynik = mi[i]; //dobrze?
+	}
+
+
+}
 
 void wyznacz_wspolczyniki_abcd() {
 	for (int i = 0; i < K; i++) {
@@ -114,6 +145,9 @@ int main()
 	wylicz_mi();
 	wylicz_lambda();
 	wylicz_delta();
+	warunki_brzegowe_a();
+
+	stworz_uklad_rownan();
 
 	return 0;
 }
