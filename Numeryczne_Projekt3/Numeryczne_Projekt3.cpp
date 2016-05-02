@@ -74,7 +74,7 @@ void wylicz_delta() {
 	delta[0] = 0;
 	delta[K - 1] = 0;
 	for (int i = 1; i < K; i++) {
-		delta[i] = (6.0 / (h[i] + h[i + 1])) * (((freq[i + 1] - freq[i]) / h[i + 1]) - ((freq[i] - freq[i - 1]) / h[i]));
+		delta[i] = (6.0 / (h[i] + h[i + 1])) * (((s21[IND][i + 1] - s21[IND][i]) / h[i + 1]) - ((s21[IND][i] - s21[IND][i - 1]) / h[i]));
 	}
 }
 
@@ -89,8 +89,8 @@ void warunki_brzegowe_b() {
 	lambda[0] = 1.0;
 	mi[K - 1] = 1.0;
 
-	delta[0] = 6.0 / h[1] * (((freq[1] - freq[0]) / h[1]) - 1); //pochodna
-	delta[K - 1] = 6.0 / h[K - 1] * (1 - ((freq[K-1] - freq[K-2]) / h[K-1])); //pochodna
+	//delta[0] = 6.0 / h[1] * (((s21[IND][1] - s21[IND][0]) / h[1]) - 1); //pochodna
+	//delta[K - 1] = 6.0 / h[K - 1] * (1 - ((s21[IND][K-1] - s21[IND][K-2]) / h[K-1])); //pochodna
 }
 
 double a[K - 1];
