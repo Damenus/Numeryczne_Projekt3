@@ -5,7 +5,7 @@
 
 #define K 20
 #define J (K - 1)
-#define N 101
+#define N 301
 #define IND 0
 #define START_F 2.16
 #define END_F 2.66
@@ -44,7 +44,8 @@ double s21[5][K] = {
 };
 
 double S_dB(double S) {
-	return 20 * log10(S);
+	double D = 20 * log10(S);
+	return D;
 }
 
 //wyliczyæ h(z definicji), mi[1] do mi[N - 1], tak samo lambda i delta, zerowe i Nte elementy z war.brzegowych, 
@@ -161,7 +162,7 @@ void gauss() {
 }
 
 void wyznacz_wspolczyniki_abcd() {
-	for (int i = 0; i < K; i++) {
+	for (int i = 0; i < K - 1; i++) {
 		a[i] = s21[IND][i];
 		b[i] = ((s21[IND][i + 1] - s21[IND][i]) / h[i + 1]) - (((2.0 * M[i] - M[i + 1]) / 6.0) * h[i + 1]);
 		c[i] = M[i] / 2.0;
@@ -184,8 +185,8 @@ void wzynacz_X() {
 void oblicz_Y() {
 	for (int i = 0; i < N; i++) { 
 		for (int j = 0; j < K; j++) {
-			if (X[i] > freq[j] && X[i] < freq[j + i]) {
-				Y[i] = (a[j] * pow(X[i], 3)) + (b[j] * pow(X[i], 2)) + (c[j] * X[i]) + d[j];
+			if (X[i] > freq[j] && X[i] < freq[j + 1]) {
+				Y[i] = (d[j] * pow(X[i] - freq[j], 3)) + (c[j] * pow(X[i] - freq[j], 2)) + (b[j] * (X[i] - freq[j])) + a[j];
 				break;
 			}
 		}
@@ -196,12 +197,12 @@ void oblicz_Y() {
 void zapis_do_pliku() {
 
 	fstream plik("plik.txt", ios::out);
-
+	
 	if (plik.good())
 	{
 		for (int i = 0; i < N; i++)
 		{
-			plik << X[i] << endl;
+			plik << S_dB(Y[i]) << endl;
 			plik.flush();
 		}
 
@@ -209,11 +210,17 @@ void zapis_do_pliku() {
 
 		for (int i = 0; i < N; i++)
 		{
-			plik << Y[i] << endl;
+			plik << X[i] << endl;
 			plik.flush();
 		}
 
 		plik.close();
+	}
+}
+
+void wypisz_M() {
+	for (int i = 0; i < K; i++) {
+		cout << i << ": " << M[i] << endl;
 	}
 }
 
@@ -232,11 +239,7 @@ int main()
 
 	wzynacz_X();
 	oblicz_Y();
-	//zapis_do_pliku();
-
-	for (int i = 0; i < K; i++) {
-		cout << i << ": " << M[i] << endl;
-	}
+	zapis_do_pliku();
 
 	return 0;
 }
