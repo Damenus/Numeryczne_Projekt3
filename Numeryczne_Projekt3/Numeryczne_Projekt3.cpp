@@ -5,8 +5,8 @@
 
 #define K 20
 #define J (K - 1)
-#define N 301
-#define IND 0
+#define N 101
+#define IND 4
 #define START_F 2.16
 #define END_F 2.66
 
@@ -44,8 +44,7 @@ double s21[5][K] = {
 };
 
 double S_dB(double S) {
-	double D = 20 * log10(S);
-	return D;
+	return 20 * log10(S);
 }
 
 //wyliczyæ h(z definicji), mi[1] do mi[N - 1], tak samo lambda i delta, zerowe i Nte elementy z war.brzegowych, 
@@ -92,19 +91,10 @@ void warunki_brzegowe_a() {
 	delta[K - 1] = 0.0;
 }
 
-void warunki_brzegowe_b() {
-	lambda[0] = 1.0;
-	mi[K - 1] = 1.0;
-
-	//delta[0] = 6.0 / h[1] * (((s21[IND][1] - s21[IND][0]) / h[1]) - 1); //pochodna
-	//delta[K - 1] = 6.0 / h[K - 1] * (1 - ((s21[IND][K-1] - s21[IND][K-2]) / h[K-1])); //pochodna
-}
-
-double a[K];
-double b[K];
-double c[K];
-double d[K];
-
+double a[K - 1];
+double b[K - 1];
+double c[K - 1];
+double d[K - 1];
 
 double M[K]; //niewiadoma
 double macierz_wspolczynikow[K][K+1];
@@ -122,12 +112,12 @@ void stworz_uklad_rownan() {
 	//wype³nienie wspó³czynikami
 	for (int i = 0; i < K; i++) {
 		if (i != K-1)
-			macierz_wspolczynikow[i][i + 1] = lambda[i]; //dobrze?
+			macierz_wspolczynikow[i][i + 1] = lambda[i];
 
 		macierz_wspolczynikow[i][i] = 2.0;
 
 		if (i != 0)
-			macierz_wspolczynikow[i][i - 1] = mi[i]; //dobrze?
+			macierz_wspolczynikow[i][i - 1] = mi[i]; 
 	}
 
 }
@@ -136,8 +126,7 @@ void gauss() {
 
 	//eliminacja
 	double m;
-	for (int i = 0; i < K; i++) { // ka¿da kolumna pokolei
-
+	for (int i = 0; i < K; i++) { 
 		for (int j = i + 1; j < K; j++) {
 			m = macierz_wspolczynikow[j][i] / macierz_wspolczynikow[i][i]; //wspo³czynnik mno¿enia pierwszego weirsza, by odj¹æ od kolejnych kolumn, by wyzerowaæ dolny trójk¹t
 			for (int k = i; k < K + 1; k++) { // zerowanie kolumny
@@ -146,9 +135,8 @@ void gauss() {
 		}
 	}
 
-	double s;
 	//obliczanie
-	//int n = K - 1;
+	double s;	
 	M[K - 1] = macierz_wspolczynikow[K - 1][K] / macierz_wspolczynikow[K - 1][K - 1];
 
 	for (int i = K - 1 - 1; i >= 0; i--){
@@ -164,7 +152,7 @@ void gauss() {
 void wyznacz_wspolczyniki_abcd() {
 	for (int i = 0; i < K - 1; i++) {
 		a[i] = s21[IND][i];
-		b[i] = ((s21[IND][i + 1] - s21[IND][i]) / h[i + 1]) - (((2.0 * M[i] - M[i + 1]) / 6.0) * h[i + 1]);
+		b[i] = ((s21[IND][i + 1] - s21[IND][i]) / h[i + 1]) - ((((2.0 * M[i]) + M[i + 1]) / 6.0) * h[i + 1]);
 		c[i] = M[i] / 2.0;
 		d[i] = (M[i + 1] - M[i]) / (6.0 * h[i + 1]);
 	}
@@ -177,16 +165,16 @@ void wzynacz_X() {
 	//liczye co ile bedzie X
 	double krok = (END_F - START_F) / N;
 	//wyznaczam wszystkie X
-	for (int i = 0; i < N; i++) { //i mo¿e zaczynaæ siê od 1
-		X[i] = START_F + (i * krok);
+	for (int i = 0; i < N; i++) {  
+		X[i] = START_F + ((1+i) * krok);
 	}
 }
 
 void oblicz_Y() {
 	for (int i = 0; i < N; i++) { 
 		for (int j = 0; j < K; j++) {
-			if (X[i] > freq[j] && X[i] < freq[j + 1]) {
-				Y[i] = (d[j] * pow(X[i] - freq[j], 3)) + (c[j] * pow(X[i] - freq[j], 2)) + (b[j] * (X[i] - freq[j])) + a[j];
+			if (X[i] >= freq[j] && X[i] < freq[j + 1]) {
+				Y[i] = (d[j] * pow(X[i] - freq[j], 3)) + (c[j] * pow(X[i] - freq[j], 2)) + (b[j] * (X[i] - freq[j])) + a[j];				
 				break;
 			}
 		}
