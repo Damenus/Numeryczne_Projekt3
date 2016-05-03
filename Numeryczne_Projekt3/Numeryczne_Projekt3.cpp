@@ -6,7 +6,7 @@
 #define K 20
 #define J (K - 1)
 #define N 101
-#define IND 4
+#define IND 0
 #define START_F 2.16
 #define END_F 2.66
 
@@ -50,14 +50,14 @@ double S_dB(double S) {
 //wyliczyæ h(z definicji), mi[1] do mi[N - 1], tak samo lambda i delta, zerowe i Nte elementy z war.brzegowych, 
 //potem rozwi¹zaæ uk³ad równañ liniowych, czyli wyznaczyæ M, podstawiæ do wzoru na szukane a, b, c i d.
 
-double h[K - 1];
+double h[K];
 double mi[K - 1];
 double lambda[K - 1];
 double delta[K - 1];
 
 void wylicz_h() {
 	for (int i = 0; i < K; i++) {
-		h[i] = freq[i + 1] - freq[i];
+		h[i+1] = freq[i + 1] - freq[i];
 	}
 }
 
@@ -99,19 +99,13 @@ void warunki_brzegowe_b() {
 	//delta[K - 1] = 6.0 / h[K - 1] * (1 - ((s21[IND][K-1] - s21[IND][K-2]) / h[K-1])); //pochodna
 }
 
-double a[K - 1];
-double b[K - 1];
-double c[K - 1];
-double d[K - 1];
+double a[K];
+double b[K];
+double c[K];
+double d[K];
 
-//niewiadoma!!!
-struct M{
-	double wartosc = 0.0;
-	double wspolczynik = 1.0;
-	// b + 2 * c * ( x1 -x0) + 3 * d * (x1 - x0) ^ 2
-}Mn[K];
 
-double M[K];
+double M[K]; //niewiadoma
 double macierz_wspolczynikow[K][K+1];
 
 void stworz_uklad_rownan() {
@@ -191,7 +185,7 @@ void oblicz_Y() {
 	for (int i = 0; i < N; i++) { 
 		for (int j = 0; j < K; j++) {
 			if (X[i] > freq[j] && X[i] < freq[j + i]) {
-				Y[i] = a[j] * pow(X[i], 3) + b[j] * pow(X[i], 2) + c[j] * X[i] + d[j];
+				Y[i] = (a[j] * pow(X[i], 3)) + (b[j] * pow(X[i], 2)) + (c[j] * X[i]) + d[j];
 				break;
 			}
 		}
@@ -238,7 +232,7 @@ int main()
 
 	wzynacz_X();
 	oblicz_Y();
-	zapis_do_pliku();
+	//zapis_do_pliku();
 
 	for (int i = 0; i < K; i++) {
 		cout << i << ": " << M[i] << endl;
@@ -246,4 +240,3 @@ int main()
 
 	return 0;
 }
-
