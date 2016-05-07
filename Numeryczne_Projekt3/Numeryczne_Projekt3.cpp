@@ -3,19 +3,18 @@
 #include <math.h>
 #include <fstream>
 
-#define K 20
-#define J (K - 1)
-#define N 101
-#define IND 4
-#define START_F 2.16
-#define END_F 2.66
+#define K 20 //liczba wêz³ów
+#define N 101 //liczba wartoœci charakterystyki przybli¿onej
+#define IND 4  //ostatnia cyfra indeksu do wybrania dobrego zestawu danych
+#define START_F 2.16 //pocz¹tek zakresu
+#define END_F 2.66 //koniec zakresu
 
 using namespace std;
-
+//X, czêstotliwoœci w których zmierzono wartoœci, inaczej wêz³y
 double freq[K] = { 2.160913, 2.184642, 2.208656, 2.232956, 2.257543, 2.282417, 2.307579, 2.333029,
 2.358767, 2.384794, 2.411110, 2.437714, 2.464608, 2.491789, 2.519259, 2.547017, 2.575062,
 2.603393, 2.632010, 2.660913 };
-
+//Y, mzierzone wartoœci
 double s21[5][K] = {
 	//indeksy 0 lub 5
 	{ 0.0154473160, 0.0182357086, 0.0194462133, 0.0118513804, 0.0414972492, 0.4124997372,
@@ -42,7 +41,7 @@ double s21[5][K] = {
 	0.9992090072, 0.9877714749, 0.9997958915, 0.9872738013, 0.9872738013, 0.9997958915, 0.9877714749,
 	0.9992090072, 0.5274988276, 0.0681165327, 0.0222182757, 0.0406238069, 0.0418602337, 0.0385736053 }
 };
-
+// funkcja logarytmiczna, pozwalaj¹ca zobrazowaæ wyniki na wykresie
 double S_dB(double S) {
 	return 20 * log10(S);
 }
@@ -50,8 +49,9 @@ double S_dB(double S) {
 //wyliczyæ h(z definicji), mi[1] do mi[N - 1], tak samo lambda i delta, zerowe i Nte elementy z war.brzegowych, 
 //potem rozwi¹zaæ uk³ad równañ liniowych, czyli wyznaczyæ M, podstawiæ do wzoru na szukane a, b, c i d.
 
-double h[K];
-double mi[K - 1];
+//wspó³czynniki do stworzenia uk³adu równañ, K-1(19) ró¿nañ miêdzy wêz³ami
+double h[K]; //odleg³oœci miêdzy wêz³ami, indeksy od 1
+double mi[K - 1]; 
 double lambda[K - 1];
 double delta[K - 1];
 
@@ -101,7 +101,7 @@ double macierz_wspolczynikow[K][K+1];
 
 void stworz_uklad_rownan() {
 
-	//wyzerowanie pól, wpisanie wartoœci do kolumny wyrazów wolnych
+	//wyzerowanie pól oraz wpisanie wartoœci do kolumny wyrazów wolnych
 	for (int i = 0; i < K; i++) {
 		for (int j = 0; j < K; j++) {
 			macierz_wspolczynikow[i][j] = 0.0;
@@ -137,9 +137,9 @@ void gauss() {
 
 	//obliczanie
 	double s;	
-	M[K - 1] = macierz_wspolczynikow[K - 1][K] / macierz_wspolczynikow[K - 1][K - 1];
+	M[K - 1] = macierz_wspolczynikow[K - 1][K] / macierz_wspolczynikow[K - 1][K - 1]; //w macierzy z wyzerowanej dolnym trójk¹tem, w ostatnim wierszu na przk¹tnej(ostatnia kolumna) zostaje jeden wspó³czynnik, co pozwala wyliczenie ostatniej niewiadomej  
 
-	for (int i = K - 1 - 1; i >= 0; i--){
+	for (int i = K - 1 - 1; i >= 0; i--){ //liczenie od koñca kolejnych niewiadmoych
 		s = 0;
 		for (int k = i + 1; k < K; k++) {
 			s = s + macierz_wspolczynikow[i][k] * M[k];
@@ -173,7 +173,7 @@ void wzynacz_X() {
 void oblicz_Y() {
 	for (int i = 0; i < N; i++) { 
 		for (int j = 0; j < K; j++) {
-			if (X[i] >= freq[j] && X[i] < freq[j + 1]) {
+			if (X[i] >= freq[j] && X[i] < freq[j + 1]) { //znajdŸ której funckji przybli¿aj¹cej u¿yæ i wylicz wartoœæ
 				Y[i] = (d[j] * pow(X[i] - freq[j], 3)) + (c[j] * pow(X[i] - freq[j], 2)) + (b[j] * (X[i] - freq[j])) + a[j];				
 				break;
 			}
@@ -190,7 +190,7 @@ void zapis_do_pliku() {
 	{
 		for (int i = 0; i < N; i++)
 		{
-			plik << S_dB(Y[i]) << endl;
+			plik << S_dB(Y[i]) << endl; //u¿yj logarytmu by uzyskaæ wynik do pokazania na wykresie
 			plik.flush();
 		}
 
@@ -206,7 +206,7 @@ void zapis_do_pliku() {
 	}
 }
 
-void wypisz_M() {
+void wypisz_M() { //wypisz M (niewiadome) do porównania wyników
 	for (int i = 0; i < K; i++) {
 		cout << i << ": " << M[i] << endl;
 	}
@@ -222,12 +222,12 @@ int main()
 
 	stworz_uklad_rownan();
 	gauss();
-
+	
 	wyznacz_wspolczyniki_abcd();
 
 	wzynacz_X();
 	oblicz_Y();
 	zapis_do_pliku();
-
+	
 	return 0;
 }
